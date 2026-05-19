@@ -183,56 +183,94 @@ export default function CityRoutesView({ city, onBack, onRouteClick, onExploreNe
                   <p className="text-cyan-400 text-sm">{isCardFlipped ? "CITY CARD ACQUIRED" : "点击卡片翻开你的奖励"}</p>
                 </div>
 
-                <div 
-                   className="relative w-64 h-[360px] [transform-style:preserve-3d] cursor-pointer transition-transform duration-700 hover:scale-105"
+                <motion.div 
+                   className="relative w-64 h-[360px] [transform-style:preserve-3d] cursor-pointer"
+                   whileHover={!isCardFlipped && !isLightingUp ? { scale: 1.05, y: -5 } : {}}
+                   animate={{ 
+                       rotateY: isCardFlipped ? 180 : (isLightingUp ? [-2, 2, -2, 2, -2, 2, 0] : 0), 
+                       scale: isCardFlipped ? 1 : (isLightingUp ? 0.95 : 1)
+                   }}
+                   transition={{ 
+                       rotateY: isCardFlipped ? { type: "spring", stiffness: 50, damping: 15 } : { duration: 0.4 },
+                       scale: { duration: 0.3 }
+                   }}
                    onClick={() => {
                      if (isCardFlipped || isLightingUp) return;
                      setIsLightingUp(true);
                      setTimeout(() => {
-                       setIsLightingUp(false);
                        setIsCardFlipped(true);
-                     }, 800);
+                       setTimeout(() => setIsLightingUp(false), 800);
+                     }, 600);
                    }}
-                   style={{ transform: isCardFlipped ? "rotateY(180deg)" : "rotateY(0deg)" }}
                 >
+                   {/* Light burst effects inside */}
                    <AnimatePresence>
-                     {isLightingUp && (
+                     {isLightingUp && !isCardFlipped && (
                        <motion.div
-                         initial={{ opacity: 0, scale: 0.1 }}
-                         animate={{ opacity: [0, 1, 1, 0], scale: [0.1, 1.5, 3, 4] }}
+                         initial={{ opacity: 0, scale: 0.8 }}
+                         animate={{ opacity: [0, 0.8, 0.4, 1], scale: 1.2 }}
                          exit={{ opacity: 0 }}
-                         transition={{ duration: 0.8, times: [0, 0.4, 0.7, 1], ease: "easeOut" }}
-                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-amber-400 mix-blend-screen blur-[30px] rounded-full z-50 pointer-events-none"
+                         transition={{ duration: 0.6 }}
+                         className="absolute inset-0 bg-cyan-400/50 mix-blend-screen blur-[30px] rounded-2xl z-0 pointer-events-none"
+                       />
+                     )}
+                     {isCardFlipped && (
+                       <motion.div
+                         initial={{ opacity: 1, scale: 1 }}
+                         animate={{ opacity: 0, scale: 2.5 }}
+                         transition={{ duration: 1, ease: "easeOut" }}
+                         className="absolute inset-0 bg-white mix-blend-overlay blur-[40px] rounded-2xl z-50 pointer-events-none"
                        />
                      )}
                    </AnimatePresence>
 
                    {/* Card Back */}
-                   <div className="absolute inset-0 [backface-visibility:hidden] bg-slate-800 border-2 border-white/20 rounded-2xl shadow-2xl flex flex-col items-center justify-center">
-                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 rounded-2xl"></div>
-                     <div className="w-20 h-20 bg-slate-700/50 rounded-full flex items-center justify-center mb-4 border border-white/10 relative overflow-hidden">
+                   <div className="absolute inset-0 [backface-visibility:hidden] bg-slate-800 border-[3px] border-white/10 hover:border-white/20 rounded-2xl shadow-2xl flex flex-col items-center justify-center transition-colors">
+                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 rounded-2xl pointer-events-none"></div>
+                     <div className="w-20 h-20 bg-slate-700/50 rounded-full flex items-center justify-center mb-6 border border-white/10 shadow-[0_0_30px_rgba(255,255,255,0.05)] relative overflow-hidden transition-shadow pointer-events-none">
                        <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/20 to-transparent animate-pulse" />
-                       <Globe2 size={40} className="text-slate-400" />
+                       <Globe2 size={40} className="text-slate-400 relative z-10" />
                      </div>
-                     <p className="text-slate-400 text-xs font-mono mb-2 tracking-widest relative z-10">TAP TO REVEAL</p>
-                     <div className="text-white/30 text-3xl animate-bounce mt-4 relative z-10">👆</div>
+                     <p className="text-slate-400 text-xs font-mono mb-2 tracking-[0.2em] relative z-10 font-medium pointer-events-none">TAP TO REVEAL</p>
+                     <motion.div 
+                        animate={{ y: [0, -6, 0] }} 
+                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                        className="text-white/40 text-3xl mt-4 relative z-10 pointer-events-none"
+                     >
+                        👆
+                     </motion.div>
+                     
+                     {/* Inner active border glow when charging */}
+                     {isLightingUp && !isCardFlipped && (
+                       <div className="absolute inset-0 border-4 border-cyan-400/60 shadow-[inset_0_0_30px_rgba(34,211,238,0.5)] rounded-2xl pointer-events-none"></div>
+                     )}
                    </div>
 
                    {/* Card Front */}
-                   <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-2xl shadow-[0_0_40px_rgba(34,211,238,0.4)] overflow-hidden bg-slate-900 border border-white/20 flex flex-col">
-                      <div className="h-[60%] relative">
-                        <img src={city.image} alt={city.name} className="absolute inset-0 w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent" />
-                      </div>
-                      <div className="flex-1 p-6 flex flex-col items-center justify-center text-center -mt-6 relative z-10">
-                         <h3 className="text-3xl font-bold text-white mb-1 drop-shadow-md">{city.name}</h3>
-                         <div className="text-xs text-slate-400 font-mono tracking-widest uppercase">{city.englishName}</div>
-                         <div className="mt-4 px-3 py-1 bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-[10px] rounded-full uppercase tracking-widest">
-                           {city.routes} Routes Completed
-                         </div>
-                      </div>
+                   <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-2xl shadow-[0_0_50px_rgba(34,211,238,0.4)] overflow-hidden bg-slate-900 border-2 border-cyan-400/40 flex flex-col">
+                       <div className="h-[55%] relative pointer-events-none">
+                         <img src={city.image} alt={city.name} className="absolute inset-0 w-full h-full object-cover" />
+                         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+                         
+                         <motion.div 
+                           initial={{ x: '-100%', opacity: 0 }}
+                           animate={isCardFlipped ? { x: '200%', opacity: [0, 1, 0] } : {}}
+                           transition={{ duration: 1.5, ease: "easeInOut", delay: 0.2 }}
+                           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"
+                         />
+                       </div>
+                       <div className="flex-1 p-6 flex flex-col items-center justify-center text-center -mt-6 relative z-10 pointer-events-none">
+                          <h3 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-cyan-200 mb-2 drop-shadow-[0_2px_10px_rgba(34,211,238,0.5)]">{city.name}</h3>
+                          <div className="text-xs text-cyan-400/80 font-mono tracking-[0.2em] uppercase mb-4">{city.englishName}</div>
+                          <div className="px-4 py-1.5 bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 text-[11px] rounded-full uppercase tracking-widest font-semibold shadow-[0_0_15px_rgba(34,211,238,0.2)]">
+                            {city.routes} Routes Completed
+                          </div>
+                       </div>
+                       
+                       {/* Floating particles on front */}
+                       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30 pointer-events-none mix-blend-screen"></div>
                    </div>
-                </div>
+                </motion.div>
 
                 <AnimatePresence>
                   {isCardFlipped && (

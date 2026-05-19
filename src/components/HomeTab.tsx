@@ -263,8 +263,8 @@ export default function HomeTab({ onNavigate, completedChapters = [], targetFlig
                 text: 'text-amber-100 bg-amber-950/80 border border-amber-500/30',
               },
               'lit': {
-                dot: 'bg-amber-400 ring-amber-400/30 shadow-[0_0_15px_rgba(251,191,36,0.8)]',
-                text: 'text-amber-100 bg-amber-950/80 border border-amber-500/30',
+                dot: 'bg-[#2ecc71] ring-[#2ecc71]/40 shadow-[0_0_25px_rgba(46,204,113,0.8)] z-10',
+                text: 'text-[#2ecc71] bg-black/80 border border-[#2ecc71]/40',
               },
               'upcoming': {
                 dot: 'bg-slate-700/60 ring-slate-800/30 shadow-none',
@@ -286,6 +286,12 @@ export default function HomeTab({ onNavigate, completedChapters = [], targetFlig
                 onClick={() => handleCityClick(city)}
               >
                 <div className={cn("w-3 h-3 rounded-full cursor-pointer ring-4 relative flex items-center justify-center", config.dot)}>
+                  {city.status === 'lit' && (
+                     <>
+                       <div className="absolute inset-0 rounded-full bg-[#2ecc71] opacity-40 blur-[8px] animate-pulse pointer-events-none" style={{ transform: 'scale(3)' }}></div>
+                       <span className="absolute inline-flex h-full w-full rounded-full bg-[#2ecc71] opacity-60 animate-ping pointer-events-none" style={{ animationDuration: '2s' }}></span>
+                     </>
+                  )}
                   <div className={cn(
                     "absolute px-2 py-1 rounded-md text-[10px] font-medium whitespace-nowrap shadow-sm pointer-events-none transition-all duration-300", 
                     config.text,
@@ -632,10 +638,11 @@ export default function HomeTab({ onNavigate, completedChapters = [], targetFlig
 
                       return (
                         <div key={city.id} className={`relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group ${!isLocked ? 'is-active' : ''}`}>
-                          <div className={`flex items-center justify-center w-8 h-8 rounded-full border-4 border-[#05070A] ${isLit ? 'bg-[#2ecc71] text-slate-100 shadow-[0_0_15px_rgba(46,204,113,0.5)]' : isInProgress ? 'bg-cyan-500 text-slate-100 shadow-[0_0_15px_rgba(34,211,238,0.5)]' : 'bg-slate-800 text-slate-400'} shrink-0 z-10 font-bold text-xs relative`}>
+                          <div className={`flex items-center justify-center w-8 h-8 rounded-full border-4 border-[#05070A] ${isLit ? 'bg-[#2ecc71] text-slate-100 shadow-[0_0_20px_rgba(46,204,113,0.8)]' : isInProgress ? 'bg-cyan-500 text-slate-100 shadow-[0_0_15px_rgba(34,211,238,0.5)]' : 'bg-slate-800 text-slate-400'} shrink-0 z-10 font-bold text-xs relative`}>
+                            {isLit && <span className="absolute w-full h-full rounded-full bg-[#2ecc71] animate-ping opacity-40"></span>}
                             {String(index + 1).padStart(2, '0')}
                           </div>
-                          <div className={`w-[calc(100%-3rem)] md:w-[calc(50%-2rem)] bg-white/5 border ${isLit ? 'border-[#2ecc71]/30' : isInProgress ? 'border-cyan-500/30' : 'border-white/5'} rounded-2xl p-4 shadow-lg backdrop-blur-sm ${isLocked ? 'opacity-60' : ''}`}>
+                          <div className={`w-[calc(100%-3rem)] md:w-[calc(50%-2rem)] bg-white/5 border ${isLit ? 'border-[#2ecc71]/40 shadow-[0_0_20px_rgba(46,204,113,0.15)] bg-[#2ecc71]/[0.02]' : isInProgress ? 'border-cyan-500/30' : 'border-white/5'} rounded-2xl p-4 shadow-lg backdrop-blur-sm ${isLocked ? 'opacity-60' : ''}`}>
                              <div className="flex items-start justify-between mb-1 gap-2">
                                 <div>
                                   <h3 className={`${isLit ? 'text-[#2ecc71]' : isInProgress ? 'text-cyan-400' : 'text-slate-300'} font-bold text-lg`}>第{numStr}城：{city.name}</h3>
